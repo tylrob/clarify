@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Clarify</title>
+		<link rel="stylesheet" href="css/main.css">
+	</head>
+	<body>
+		<div id="hook"></div>
+		
+
+		<!-- Layout template -->
+		<script type="text/template" id="layout-template">
+			<h1>Clarify</h1>
+			<hr>
+			<div id="header">Header Section</div>
+			<hr>
+			<div id="main">Main Section</div>
+			<hr>
+			<div id="footer">Footer Section</div>
+		</script>
+
+		<!-- Template for navigation view -->
+		<script type="text/template" id="nav-view">
+			<p><a href="#" id="add-input-btn">Add new input</a> <a href="#" id="remove-all-inputs-btn">Remove all</a></p>
+		</script>		
+
+		<!-- Template for composite view -->
+		<script type="text/template" id="composite-view">
+			<p>Input Name: <%= name %></p>
+			<div class="composite-attach"></div>
+		</script>
+
+		<!-- Template for an Input -->
+		<script type="text/template" id="input-item-view">
+			<p>Input Value: <span><%= text %></span><input class="input hidden"></p>
+		</script>
+
+		<!-- Template for composite view -->
+		<script type="text/template" id="output-composite-view">
+			<p>Name passed from model: <%= name %></p>
+			<div class="output-composite-attach"></div>
+		</script>
+
+		<!-- Template for an Input -->
+		<script type="text/template" id="output-item-view">
+			<p>Name: <%= text %></p>
+		</script>
+
+		<script type="text/javascript" src="js/jquery.js"></script>
+		<script type="text/javascript" src="js/underscore.js"></script>
+		<script type="text/javascript" src="js/backbone.js"></script>
+		<script type="text/javascript" src="js/backbone-associations.js"></script>
+		<script type="text/javascript" src="js/backbone.localStorage.js"></script>
+		<script type="text/javascript" src="js/backbone.marionette.js"></script>
+		<script type="text/javascript" src="js/main.js"></script>
+	</body>
+</html>
