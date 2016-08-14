@@ -1,7 +1,10 @@
 //App
 var App = Marionette.Application.extend({
 	initialize: function(){
+		//Assign a layout to the App, which in turn assigns the Regions upon its creation.
 		this.myLayout = new MyLayout().render();
+
+		//App.vent is native to Marionette.
 		this.vent.on("inputItemViewSelected", function(someData){
 			console.log("Hello from " + someData);
 
@@ -299,7 +302,6 @@ var InputItemView = Marionette.ItemView.extend({
 	},
 	events: {
 		'click': 'select',
-		'dblclick': 'edit',
 		'keypress': 'updateOnEnter',
 		'blur input': 'close'
 	},
@@ -312,7 +314,7 @@ var InputItemView = Marionette.ItemView.extend({
 	},
 	select: function(){
 		if (!this.$('input').hasClass('hidden')) {
-			console.log("don't reselect; it's already selected");
+			console.log("don't reselect; it's already selected (input not hidden)");
 			return;
 		} else {
 			this.trigger('childSelected', this.model.cid);
@@ -376,7 +378,9 @@ var OutputItemView = Marionette.ItemView.extend({
 		this.listenTo(this.model, 'change', this.render);
 	},
 	events: {
-		"click": "select"
+		'click': 'select',
+		'keypress': 'updateOnEnter',
+		'blur input': 'close'
 	},
 	onBeforeRender: function(){
 		if (this.model.get('selected') === 'selected') {
@@ -386,8 +390,38 @@ var OutputItemView = Marionette.ItemView.extend({
 		}
 	},
 	select: function(){
-		this.trigger('childSelected', this.model.cid);
-		app.vent.trigger('outputItemViewSelected', this.model.cid);
+		if (!this.$('input').hasClass('hidden')) {
+			console.log("don't reselect, it's alreay selected (output not hidden)");
+			return;
+		} else {
+			this.trigger('childSelected', this.model.cid);
+			app.vent.trigger('outputItemViewSelected', this.model.cid);
+			this.edit();
+		}
+	},
+	edit: function(){
+		var prepopulatedValue = this.model.get('text');
+		this.$('input').val(prepopulatedValue);
+		this.$('input').removeClass('hidden');
+		this.$('span').addClass('hidden');
+		this.$('input').focus();
+	},
+	close: function(){
+		console.log("OutputItemView's close method is running");
+		var value = this.$('input').val();
+		var trimmedValue = value.trim();
+
+		if (trimmedValue){
+			this.model.save({text: trimmedValue});
+		}
+
+		this.$('input').addClass('hidden');
+		this.$('span').removeClass('hidden');
+	},
+	updateOnEnter: function(e){
+		if (e.which === 13) { // ENTER_KEY is 13
+			this.close();
+		}
 	}
 });
 
@@ -431,9 +465,6 @@ var NavView = Marionette.ItemView.extend({
 
 //Start App
 var app = new App();
-
-
-
 
 //Begin app initialization
 app.inputs = new Inputs();
