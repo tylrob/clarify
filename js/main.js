@@ -34,7 +34,11 @@ var App = Marionette.Application.extend({
 			return;
 		}
 		this.inputs.create();
+
+		this.setPrevOutputs(this.outputs, this.prevOutputs);
+		this.setPrevRelationships(this.relationships, this.prevRelationships);
 		this.computeRelationships(this.inputs, this.outputs, this.relationships);
+		this.mapExistingRelationships(this.relationships, this.prevRelationships, this.outputs, this.prevOutputs);
 	},
 	removeAllInputs: function(){
 		//Should leave the screen with one Boolean input and one output with two options
@@ -48,13 +52,52 @@ var App = Marionette.Application.extend({
 		this.computeRelationships(this.inputs, this.outputs, this.relationships);	
 
 	},
+	setPrevOutputs: function(outputs, prevOutputs){
+		
+		prevOutputs.at(0).get('outputValues').reset();
+
+		for (var i = 0; i < outputs.at(0).get('outputValues').length; i++){
+			var outputText = outputs.at(0).get('outputValues').at(i).get('text');
+			var outputPrevCid = outputs.at(0).get('outputValues').at(i).cid;
+
+			prevOutputs.at(0).get('outputValues').create({text: outputText, prevCid: outputPrevCid});
+		}
+
+	},
+	setPrevRelationships: function(relationships, prevRelationships){
+		//Reset app.prevRelationships
+		prevRelationships.reset();
+		for (var i = 0; i < relationships.length; i++){
+			var relOutput = relationships.at(i).get('output');
+			var relInput = [];
+
+			for (var j = 0; j < relationships.at(i).get('inputs').length; j++){
+				relInput.push(relationships.at(i).get('inputs')[j]);
+			}
+
+			prevRelationships.create({inputs: relInput, output: relOutput});
+		}
+		/*I'm creating an array here, the relInput aray, and then creating 
+		a prevRelationships item and setting that array inside it. But where is the 
+		reference to that array once the function terminates?
+		How does this work?
+		*/
+	},
 	computeRelationships: function(inputs, outputs, relationships){
 		//takes as arguments an inputs collection and a relationships collection
 
-		//Start by resetting output and relationships
+		//Make a deep clone of the app's relationships collection
+		//Store it as app.prevRelationships
+
+
+		//Reset app's outputs collection
 		outputs.at(0).get('outputValues').reset();
+
+		//Reset app's relationships collection
 		relationships.reset();
 
+		//Set up counter, maxes and an iterator to track the creation of
+		//all the outputs and relationships
 		var counters = [], maxes = [], iterator = 0;
 
 		//Figure out what values to give counters and maxes.
@@ -97,6 +140,62 @@ var App = Marionette.Application.extend({
 			relationships.create({inputs: inputValueCids, output: newestOutput.cid});
 
 		outputs.at(0).setInitialSelectedValue();
+	},
+	mapExistingRelationships: function(relationships, prevRelationships, outputs, prevOutputs){
+		console.log("mapExistingRelationships");
+		for (var i = 0; i < relationships.length; i++){
+			//make a copy of the inputs array to play with in this function
+			var freshInputs = relationships.at(i).get('inputs').slice();
+
+			//1. figure out the index of the greatest valued fresh input cid
+			var max = Number(freshInputs[0].slice(1));
+			console.log("Default max is " + max);
+			var maxIndex = 0;
+
+			for (var j = 1; j < freshInputs.length; j++){
+				if (Number(freshInputs[j].slice(1)) > max){
+					max = Number(freshInputs[j].slice(1));
+					maxIndex = j;
+				}
+			}
+			console.log("maxIndex is found to be " + maxIndex);
+
+			//2. splice freshInputs so that the greatest value is removed
+			console.log("Pre-spliced freshInputs is " + freshInputs);
+			freshInputs.splice(maxIndex, 1);
+			console.log("Spliced freshInputs is " + freshInputs);
+			
+			//3. use the local copy (aka freshInputs) as the criteria for a search
+			//through the 'prevRelationships' collection
+			var found = prevRelationships.find(function(relationship){
+				return _.isEqual(relationship.get('inputs'),freshInputs)
+			});
+
+			if (found){
+				console.log(found.get('inputs'));
+			} else {
+				console.log("No match found");
+				return;
+			}
+
+			//4. if you find a match, take relationships.at(i).get('output')
+			//which is a cid and find the output value corresponding to it
+			var foundCid = found.get('output');
+			console.log("the cid of the prevOutput to use is " + foundCid);
+			
+			//5. Find the prevOutput corresponding to the cid we found
+			var foundPrevOutput = prevOutputs.at(0).get('outputValues').findWhere({prevCid: foundCid});
+			var foundPrevOutputText = foundPrevOutput.get('text');
+			console.log("the output associated with that cid is " + foundPrevOutputText);
+
+			//6. Save the value associated with the prevOutput to the new output.
+			var loopCurrentOutput = relationships.at(i).get('output');
+			outputs.at(0).get('outputValues').get(loopCurrentOutput).set({text: foundPrevOutputText});
+			console.log("Set new output cid " + loopCurrentOutput + " to the value " + foundPrevOutputText);
+
+			//7. Remove the prevRelationship so it isn't used again
+			prevRelationships.remove(found);			
+		}
 	}
 });
 
@@ -192,7 +291,8 @@ var Inputs = Backbone.Collection.extend({
 var OutputValue = Backbone.Model.extend({
 	defaults: {
 		text: 'Untitled Output',
-		selected: 'not-selected'
+		selected: 'not-selected',
+		prevCid: null
 	},
 	initialize: function(){
 		//console.log("OutputValue model initialized " + this.cid);
@@ -470,6 +570,8 @@ var app = new App();
 app.inputs = new Inputs();
 app.outputs = new Outputs();
 app.relationships = new Relationships();
+app.prevOutputs = new Outputs();
+app.prevRelationships = new Relationships();
 
 app.inputsView = new InputsView({collection: app.inputs});
 app.outputsView = new OutputsView({collection: app.outputs});
