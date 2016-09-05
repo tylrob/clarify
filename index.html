@@ -22,7 +22,7 @@
 
 		<!-- Template for navigation view -->
 		<script type="text/template" id="nav-view">
-			<p><a href="#" id="add-input-btn">Add new input</a> <a href="#" id="remove-all-inputs-btn">Remove all</a></p>
+			<p><a href="#" id="add-input-btn">Add new input</a> <a href="#" id="remove-all-inputs-btn">Remove all</a> <a href="#" id="export-btn">Export to CSV</a></p>
 		</script>		
 
 		<!-- Template for composite view -->
@@ -33,7 +33,7 @@
 
 		<!-- Template for an Input -->
 		<script type="text/template" id="input-item-view">
-			<p>Input Value: <span><%= text %></span><input class="input hidden"></p>
+			<p>Input Value: <input class="input"></p>
 		</script>
 
 		<!-- Template for composite view -->
@@ -44,7 +44,7 @@
 
 		<!-- Template for an Output -->
 		<script type="text/template" id="output-item-view">
-			<p>Output Value: <span><%= text %></span><input class="input hidden"></p>
+			<p>Output Value: <input class="input"></p>
 		</script>
 
 		<script type="text/javascript" src="js/jquery.js"></script>

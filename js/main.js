@@ -42,12 +42,12 @@ var App = Marionette.Application.extend({
 	},
 	removeAllInputs: function(){
 		//Should leave the screen with one Boolean input and one output with two options
-		app.inputs.reset();
-		app.outputs.reset();
-		app.relationships.reset();		
+		this.inputs.reset();
+		this.outputs.reset();
+		this.relationships.reset();		
 
-		app.inputs.create();
-		app.outputs.create();
+		this.inputs.create();
+		this.outputs.create();
 		
 		this.computeRelationships(this.inputs, this.outputs, this.relationships);	
 
@@ -196,6 +196,45 @@ var App = Marionette.Application.extend({
 			//7. Remove the prevRelationship so it isn't used again
 			prevRelationships.remove(found);			
 		}
+	},
+/*Inspired by code from http://halistechnology.com/2015/05/28/use-javascript-to-export-your-data-as-csv/ */
+	convertUserDataToCsv: function(){  
+		//Try iterating through the Relationships to build a table of CIDs.
+		//Then loop back through that table substituting in the text representation of each of those CIDs.
+		console.log("converting user data to csv");
+
+	    var result, col, row;
+
+	    col = ',';
+	    row = '\n';
+
+	    result = '';
+	    result += 'tyler';
+	    result += columnDelimiter;
+	    result += 'meris';
+	    result += lineDelimiter;
+	    result += 'tyler';
+	    result += columnDelimiter;
+	    result += 'meris';
+
+	    return result;
+	},
+	exportToCsv: function(){
+		console.log("preparing file download");
+
+		var csv = this.convertUserDataToCsv();
+		
+		if (csv == null) {
+			console.log("exportToCsv didn't get any data")
+			return;
+		}
+
+	    csv = 'data:text/csv;charset=utf-8,' + csv;
+		data = encodeURI(csv);
+		link = document.createElement('a');
+		link.setAttribute('href', data);
+		link.setAttribute('download', 'clarify-export.csv');
+		link.click();
 	}
 });
 
@@ -398,39 +437,40 @@ var MyLayout = Marionette.LayoutView.extend({
 var InputItemView = Marionette.ItemView.extend({
 	template: "#input-item-view",
 	initialize: function(){
-		this.listenTo(this.model, 'change', this.render);
+		this.listenTo(this.model, 'change:selected', this.syncHighlightToModel);
+		this.syncHighlightToModel();
 	},
 	events: {
-		'click': 'select',
+		'click': function(){this.select('clickedView')},
+		'focusin input': function(){this.select('focusInput')},
 		'keypress': 'updateOnEnter',
 		'blur input': 'close'
 	},
-	onBeforeRender: function(){
+	onRender: function(){
+		var prepopulatedValue = this.model.get('text');
+		this.$('input').val(prepopulatedValue);
+	},
+	syncHighlightToModel: function(){
+		console.log("I'm syncing highlight to model");
 		if (this.model.get('selected') === 'selected') {
 			$(this.el).addClass('selected');		
 		} else {
 			$(this.el).removeClass('selected');
-		}
+		}	
 	},
-	select: function(){
-		if (!this.$('input').hasClass('hidden')) {
+	select: function(source){
+		if (this.model.get('selected') === 'selected'){	
 			console.log("don't reselect; it's already selected (input not hidden)");
 			return;
 		} else {
 			this.trigger('childSelected', this.model.cid);
 			app.vent.trigger('inputItemViewSelected', this.model.cid);
-			this.edit();	
+		}
+		if (source === 'clickedView') {
+			this.$('input').focus();	
 		}
 	},
-	edit: function(){
-		var prepopulatedValue = this.model.get('text');
-		this.$('input').val(prepopulatedValue);
-		this.$('input').removeClass('hidden');
-		this.$('span').addClass('hidden');
-		this.$('input').focus();
-	},
 	close: function(){
-
 		console.log("close running");		
 		var value = this.$('input').val();
 		var trimmedValue = value.trim();
@@ -438,9 +478,6 @@ var InputItemView = Marionette.ItemView.extend({
 		if (trimmedValue){
 			this.model.save({text: trimmedValue});
 		}
-		
-		this.$('input').addClass('hidden');
-		this.$('span').removeClass('hidden');
 	},
 	updateOnEnter: function(e){
 		if (e.which === 13) { //ENTER_KEY is 13
@@ -475,48 +512,47 @@ var InputsView = Marionette.CollectionView.extend({
 var OutputItemView = Marionette.ItemView.extend({
 	template: "#output-item-view",
 	initialize: function(){
-		this.listenTo(this.model, 'change', this.render);
+		this.listenTo(this.model, 'change:selected', this.syncHighlightToModel);
+		this.syncHighlightToModel();
 	},
 	events: {
-		'click': 'select',
+		'click': function(){this.select('clickedView')},
+		'focusin input': function(){this.select('focusInput')},
 		'keypress': 'updateOnEnter',
 		'blur input': 'close'
 	},
-	onBeforeRender: function(){
+	onRender: function(){
+		var prepopulatedValue = this.model.get('text');
+		this.$('input').val(prepopulatedValue);
+	},
+	syncHighlightToModel: function(){
+		console.log("I'm syncing highlight to model");
 		if (this.model.get('selected') === 'selected') {
 			$(this.el).addClass('selected');		
 		} else {
 			$(this.el).removeClass('selected');
-		}
+		}	
 	},
 	select: function(){
-		if (!this.$('input').hasClass('hidden')) {
-			console.log("don't reselect, it's alreay selected (output not hidden)");
+		if (this.model.get('selected') === 'selected'){	
+			console.log("don't reselect; it's already selected (input not hidden)");
 			return;
 		} else {
 			this.trigger('childSelected', this.model.cid);
 			app.vent.trigger('outputItemViewSelected', this.model.cid);
-			this.edit();
+		}
+		if (source === 'clickedView') {
+			this.$('input').focus();	
 		}
 	},
-	edit: function(){
-		var prepopulatedValue = this.model.get('text');
-		this.$('input').val(prepopulatedValue);
-		this.$('input').removeClass('hidden');
-		this.$('span').addClass('hidden');
-		this.$('input').focus();
-	},
 	close: function(){
-		console.log("OutputItemView's close method is running");
+		console.log("close running");		
 		var value = this.$('input').val();
 		var trimmedValue = value.trim();
 
 		if (trimmedValue){
 			this.model.save({text: trimmedValue});
 		}
-
-		this.$('input').addClass('hidden');
-		this.$('span').removeClass('hidden');
 	},
 	updateOnEnter: function(e){
 		if (e.which === 13) { // ENTER_KEY is 13
@@ -549,17 +585,22 @@ var NavView = Marionette.ItemView.extend({
 	template: "#nav-view",
 	ui: {
 		"addInput": "#add-input-btn",
-		"removeAll": "#remove-all-inputs-btn"
+		"removeAll": "#remove-all-inputs-btn",
+		"exportToCsv": "#export-btn"
 	},
 	events: {
 		"click @ui.addInput": "addInput",
-		"click @ui.removeAll": "removeAllInputs"
+		"click @ui.removeAll": "removeAllInputs",
+		"click @ui.exportToCsv": "exportToCsv"
 	},
 	addInput: function(){
 		this.trigger('nav.addInput');
 	},
 	removeAllInputs: function(){
 		this.trigger('nav.removeAllInputs');
+	},
+	exportToCsv: function(){
+		this.trigger('nav.exportToCsv');
 	}
 });
 
@@ -579,6 +620,7 @@ app.navView = new NavView();
 
 app.listenTo(app.navView, 'nav.addInput', app.addInput);
 app.listenTo(app.navView, 'nav.removeAllInputs', app.removeAllInputs);
+app.listenTo(app.navView, 'nav.exportToCsv', app.exportToCsv);
 
 app.computeRelationships(app.inputs, app.outputs, app.relationships);
 

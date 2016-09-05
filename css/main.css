@@ -89,16 +89,16 @@ button {
 
 
 
-.input {
-	border: none;
+/*.input {
+	border: 2px;
 	background-color: yellow;
 	font-family: serif;
 	font-size: 16px;
 }
 
 .input:focus {
-	outline: none;
-}
+	outline: 2px;
+}*/
 
 .input-value {
 	background-color: navy;
