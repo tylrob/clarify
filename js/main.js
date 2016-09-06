@@ -281,7 +281,7 @@ var Input = Backbone.AssociatedModel.extend({
 	],
 
 	defaults: {
-		name: "untitled",
+		name: "Untitled Input",
 		selectedInput: null,
 		previouslySelectedInput: null,
 		inputValues: null
@@ -307,9 +307,7 @@ var Inputs = Backbone.Collection.extend({
 	model: Input,
 	localStorage: new Backbone.LocalStorage('complexity-inputs'),
 	initialize: function(){
-		this.create({
-			name: "untitled input"
-		});
+		this.create();
 	},
 	getSelectedInputValues: function(){
 		//For each Input, ask its InputValues collection which one of its InputValues is selected
@@ -488,6 +486,10 @@ var InputItemView = Marionette.ItemView.extend({
 
 var InputView = Marionette.CompositeView.extend({
 	childView: InputItemView,
+	events: {
+		'keypress': 'updateOnEnter',
+		'blur .composite-input': 'close'
+	},
 	childEvents: {
 		'childSelected': 'childSelected'
 	},
@@ -501,6 +503,25 @@ var InputView = Marionette.CompositeView.extend({
 	template: "#composite-view",
 	initialize: function(){
 		this.collection = this.model.get('inputValues');
+	},
+	onRender: function(){
+		var prepopulatedValue = this.model.get('name');
+		this.$('.composite-input').val(prepopulatedValue);
+	},
+	close: function(){
+		console.log("composite view close running");		
+		var value = this.$('.composite-input').val();
+		var trimmedValue = value.trim();
+
+		if (trimmedValue){
+			this.model.save({name: trimmedValue});
+		}
+		console.log("saved composite view name: " + this.model.get('name'));
+	},
+	updateOnEnter: function(e){
+		if (e.which === 13) { //ENTER_KEY is 13
+			this.close();
+		}
 	}
 });
 
