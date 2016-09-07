@@ -193,36 +193,61 @@ var App = Marionette.Application.extend({
 			outputs.at(0).get('outputValues').get(loopCurrentOutput).set({text: foundPrevOutputText});
 			console.log("Set new output cid " + loopCurrentOutput + " to the value " + foundPrevOutputText);
 
-			//7. Remove the prevRelationship so it isn't used again
+			//7. Make the view refresh
+			outputs.at(0).get('outputValues').get(loopCurrentOutput).trigger('forceRender');
+
+			//8. Remove the prevRelationship so it isn't used again
 			prevRelationships.remove(found);			
 		}
 	},
-/*Inspired by code from http://halistechnology.com/2015/05/28/use-javascript-to-export-your-data-as-csv/ */
-	convertUserDataToCsv: function(){  
-		//Try iterating through the Relationships to build a table of CIDs.
-		//Then loop back through that table substituting in the text representation of each of those CIDs.
+	convertUserDataToCsv: function(inputs, outputs, relationships){  
 		console.log("converting user data to csv");
 
 	    var result, col, row;
 
 	    col = ',';
 	    row = '\n';
-
 	    result = '';
-	    result += 'tyler';
-	    result += columnDelimiter;
-	    result += 'meris';
-	    result += lineDelimiter;
-	    result += 'tyler';
-	    result += columnDelimiter;
-	    result += 'meris';
 
+	    //**For the header row
+	    for (var i = 0; i < inputs.length; i++){
+	    	var inputName = inputs.at(i).get('name');
+	    	result += inputName;
+	    	result += col;
+	    }
+	    var outputName = outputs.at(0).get('name');
+	    result += outputName;
+	    result += row;
+
+	    //**For the body 
+	    //for each relationship item
+	    //take each input cid one by one
+	    //get the input string that it represents and concatenate it to the blob
+	    //then take the output cid
+	    //get the output string that it represents and concatenate it to the blob
+	    //add a line end character
+	    //repeat
+
+		for(var i = 0; i < relationships.length; i++){
+	    	var inputsArray = relationships.at(i).get('inputs');
+	    	for (var j = 0; j < inputsArray.length; j++){
+	    		var inputCid = inputsArray[j];
+	    		var inputText = inputs.at(j).getInputValueTextByCid(inputCid);
+	    		result += inputText;
+	    		result += col;
+	    	}
+	    	var outputCid = relationships.at(i).get('output');
+	    	var outputText = outputs.at(0).getOutputValueTextByCid(outputCid);
+	    	result += outputText;
+	    	result += row;
+	    }
 	    return result;
 	},
+/*Inspired by code from http://halistechnology.com/2015/05/28/use-javascript-to-export-your-data-as-csv/ */
 	exportToCsv: function(){
 		console.log("preparing file download");
 
-		var csv = this.convertUserDataToCsv();
+		var csv = this.convertUserDataToCsv(this.inputs, this.outputs, this.relationships);
 		
 		if (csv == null) {
 			console.log("exportToCsv didn't get any data")
@@ -279,27 +304,35 @@ var Input = Backbone.AssociatedModel.extend({
 			collectionType: InputValues
 		}
 	],
-
 	defaults: {
 		name: "Untitled Input",
 		selectedInput: null,
 		previouslySelectedInput: null,
 		inputValues: null
 	},
-
 	initialize: function(){
 		console.log('Input AssociatedModel initialized ' + this.cid);
 		this.set({inputValues: new InputValues()});
 		//Make sure there is a default selectedInput attribute.
 		this.set({selectedInput: this.get('inputValues').at(0).cid});
 	},
-
 	selectInputValueByCid: function(cid){
 		this.set({'previouslySelectedInput': this.get('selectedInput')});
 		this.set({'selectedInput':cid});
 		var temp = this.get('previouslySelectedInput');
 		this.get('inputValues').get({cid: temp}).set('selected','not-selected');
 		this.get('inputValues').get({cid: cid}).set('selected','selected');
+	},
+	getInputValueTextByCid: function(cid){
+		var inputValuesCollection = this.get('inputValues');
+		var matchingInputValue = inputValuesCollection.get({cid: cid});
+		if (!matchingInputValue) {
+			console.log("No matching input value");
+			return;			
+		} else {
+		var inputValueText = matchingInputValue.get('text');
+			return inputValueText;
+		}
 	}
 });
 
@@ -359,26 +392,33 @@ var Output = Backbone.AssociatedModel.extend({
 		previouslySelectedOutputValue: null,
 		outputValues: null
 	},
-
 	initialize: function(){
 		console.log('Output AssociatedModel initialized ' + this.cid);
 		this.set({outputValues: new OutputValues()});
 	},
-
 	setInitialSelectedValue: function(){
 		console.log("default selected will be " + this.get('outputValues').at(0).cid);
 		this.get('outputValues').at(0).set('selected','selected');
 		this.set({selectedOutputValue: this.get('outputValues').at(0).cid});
 	},
-
 	selectOutputValueByCid: function(cid){
 		this.set({'previouslySelectedOutputValue': this.get('selectedOutputValue')});
 		this.set({'selectedOutputValue':cid});
 		var temp = this.get('previouslySelectedOutputValue');
 		this.get('outputValues').get({cid: temp}).set('selected','not-selected');
 		this.get('outputValues').get({cid: cid}).set('selected','selected');
+	},
+	getOutputValueTextByCid: function(cid){
+		var outputValuesCollection = this.get('outputValues');
+		var matchingOutputValue = outputValuesCollection.get({cid: cid});
+		if (!matchingOutputValue) {
+			console.log("No matching output value");
+			return;			
+		} else {
+		var outputValueText = matchingOutputValue.get('text');
+			return outputValueText;
+		}
 	}
-
 });
 
 var Outputs = Backbone.Collection.extend({
@@ -534,6 +574,7 @@ var OutputItemView = Marionette.ItemView.extend({
 	template: "#output-item-view",
 	initialize: function(){
 		this.listenTo(this.model, 'change:selected', this.syncHighlightToModel);
+		this.listenTo(this.model, 'forceRender', this.render);
 		this.syncHighlightToModel();
 	},
 	events: {
@@ -554,7 +595,7 @@ var OutputItemView = Marionette.ItemView.extend({
 			$(this.el).removeClass('selected');
 		}	
 	},
-	select: function(){
+	select: function(source){
 		if (this.model.get('selected') === 'selected'){	
 			console.log("don't reselect; it's already selected (input not hidden)");
 			return;
