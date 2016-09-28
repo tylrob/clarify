@@ -27,6 +27,10 @@ var App = Marionette.Application.extend({
 
 			app.inputs.selectInputValuesByCid(activeRelationship.get('inputs'));
 		});
+		this.vent.on("newInputValueAdded", function(){
+			app.refreshRelationships();
+			console.log("Hi");
+		});
 	},
 	addInput: function(){
 		if (this.inputs.length >= 5){
@@ -34,11 +38,13 @@ var App = Marionette.Application.extend({
 			return;
 		}
 		this.inputs.create();
-
+		this.refreshRelationships();
+	},
+	refreshRelationships: function(){
 		this.setPrevOutputs(this.outputs, this.prevOutputs);
 		this.setPrevRelationships(this.relationships, this.prevRelationships);
 		this.computeRelationships(this.inputs, this.outputs, this.relationships);
-		this.mapExistingRelationships(this.relationships, this.prevRelationships, this.outputs, this.prevOutputs);
+		this.mapExistingRelationships(this.relationships, this.prevRelationships, this.outputs, this.prevOutputs);		
 	},
 	removeAllInputs: function(){
 		//Should leave the screen with one Boolean input and one output with two options
@@ -266,7 +272,7 @@ var App = Marionette.Application.extend({
 //Input Models
 var InputValue = Backbone.Model.extend({
 	defaults: {
-		text: 'Bool',
+		text: 'New Input Value',
 		selected: 'not-selected'
 	},
 	initialize: function(){
@@ -280,13 +286,13 @@ var InputValues = Backbone.Collection.extend({
 	initialize: function(){
 		//console.log('InputValues collection initialized');
 		this.create({
-			text: 'False',
+			text: 'New Input Value',
 			selected: 'selected'
 		});
-		this.create({
+		/*this.create({
 			text: 'True',
 			selected: 'not-selected'
-		});
+		});*/
 	},
 	getSelectedInputValue: function(){
 		var selectedInputValue = this.find(function(inputValue){
@@ -466,8 +472,8 @@ var MyLayout = Marionette.LayoutView.extend({
 	template: "#layout-template",
 	regions: {
 		header: "#header",
-		main: "#main",
-		footer: "#footer"
+		inputs: "#inputs",
+		outputs: "#outputs"
 	}
 });
 
@@ -528,7 +534,8 @@ var InputView = Marionette.CompositeView.extend({
 	childView: InputItemView,
 	events: {
 		'keypress': 'updateOnEnter',
-		'blur .composite-input': 'close'
+		'blur .composite-input': 'close',
+		'click .add-new-input-value': 'addNewInputValue'
 	},
 	childEvents: {
 		'childSelected': 'childSelected'
@@ -562,6 +569,11 @@ var InputView = Marionette.CompositeView.extend({
 		if (e.which === 13) { //ENTER_KEY is 13
 			this.close();
 		}
+	},
+	addNewInputValue: function(){
+		console.log("Add new input value button clicked");
+		this.collection.create();
+		app.vent.trigger('newInputValueAdded');
 	}
 });
 
@@ -687,5 +699,5 @@ app.listenTo(app.navView, 'nav.exportToCsv', app.exportToCsv);
 app.computeRelationships(app.inputs, app.outputs, app.relationships);
 
 app.myLayout.getRegion('header').show(app.navView);
-app.myLayout.getRegion('main').show(app.inputsView);
-app.myLayout.getRegion('footer').show(app.outputsView);
+app.myLayout.getRegion('inputs').show(app.inputsView);
+app.myLayout.getRegion('outputs').show(app.outputsView);

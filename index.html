@@ -3,32 +3,49 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Clarify</title>
+		<link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
 		<link rel="stylesheet" href="css/main.css">
 	</head>
 	<body>
 		<div id="hook"></div>
-		
+		<div class="footer">
+   			<p><a href="https://github.com/tylrob/clarify">View source on GitHub</a></p>
+		</div>
 
 		<!-- Layout template -->
 		<script type="text/template" id="layout-template">
-			<h1>Clarify</h1>
-			<hr>
 			<div id="header">Header Section</div>
-			<hr>
-			<div id="main">Main Section</div>
-			<hr>
-			<div id="footer">Footer Section</div>
+			<div class="content">		
+				<div class="min-height pure-g">
+					<div class="pure-u-1-2">
+						<div id="inputs">Input Section</div>
+					</div>
+					<div class="pure-u-1-2">
+						<div id="outputs">Output Section</div>
+					</div>
+				</div>
+			</div>
 		</script>
 
 		<!-- Template for navigation view -->
 		<script type="text/template" id="nav-view">
-			<p><a href="#" id="add-input-btn">Add new input</a> <a href="#" id="remove-all-inputs-btn">Remove all</a> <a href="#" id="export-btn">Export to CSV</a></p>
+			<div class="header">
+			    <div class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed">
+			        <a class="pure-menu-heading" href="">Clarify</a>
+			        <ul class="pure-menu-list">
+			            <li class="pure-menu-item"><button id="add-input-btn" class="button-xsmall pure-button">Add Variable</button></li>
+			            <li class="pure-menu-item"><button id="remove-all-inputs-btn" class="button-xsmall pure-button">Reset All</button></li>
+			            <li class="pure-menu-item"><button id="export-btn" class="button-xsmall pure-button">Export</button></li>
+			        </ul>
+			    </div>
+			</div>
 		</script>		
 
 		<!-- Template for composite view -->
 		<script type="text/template" id="composite-view">
 			<p>Input Name: <input class="composite-input"></p>
 			<div class="composite-attach"></div>
+			<div><button class="add-new-input-value">Add New Input Value</button></div>
 		</script>
 
 		<!-- Template for an Input -->
