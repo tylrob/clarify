@@ -1,82 +1,13 @@
-/* http://meyerweb.com/eric/tools/css/reset/ 
-   v2.0 | 20110126
-   License: none (public domain)
-*/
-
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed, 
-figure, figcaption, footer, header, hgroup, 
-menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	font-size: 100%;
-	font: inherit;
-	vertical-align: baseline;
-}
-/* HTML5 display-role reset for older browsers */
-article, aside, details, figcaption, figure, 
-footer, header, hgroup, menu, nav, section {
-	display: block;
-}
-body {
-	line-height: 1;
-}
-ol, ul {
-	list-style: none;
-}
-blockquote, q {
-	quotes: none;
-}
-blockquote:before, blockquote:after,
-q:before, q:after {
-	content: '';
-	content: none;
-}
-table {
-	border-collapse: collapse;
-	border-spacing: 0;
-}
-
-/*
-====================
-Custom Styles for Complexity
-====================
-*/
-h1 {
-	font-size: 2em;
-}
-
-div {
-	margin: 5px;
-	padding: 5px;
-	border-style: solid;
-	background-color: gray;
-}
-
-button {
-	float: left;
-	clear: both;
-}
-
 #inputs {
-	clear: left;
 	float: left;
-	width: 200px;	
+	clear: left;
+
+	width: 200px;
 }
 
 #outputs {
 	float: left;
-	width: 200px;	
+	width: 200px;
 }
 
 .yellow {
@@ -86,19 +17,6 @@ button {
 .blue {
 	background-color: blue;
 }
-
-
-
-/*.input {
-	border: 2px;
-	background-color: yellow;
-	font-family: serif;
-	font-size: 16px;
-}
-
-.input:focus {
-	outline: 2px;
-}*/
 
 .input-value {
 	background-color: navy;
@@ -114,4 +32,162 @@ button {
 
 .hidden {
 	display: none;
+}
+/* NEW STYLES */
+/* Menu -- customize the .pure-menu at the top of the page */
+.home-menu {
+    padding: 0.25em;
+    text-align: left;
+    box-shadow: 0 1px 1px rgba(0,0,0, 0.10);
+}
+
+.home-menu {
+    background: #2d3e50;
+}
+.pure-menu.pure-menu-fixed {
+    /* Fixed menus normally have a border at the bottom. */
+    border-bottom: none;
+    /* I need a higher z-index here because of the scroll-over effect. */
+    z-index: 4;
+}
+
+.home-menu .pure-menu-heading {
+    color: white;
+    font-weight: 400;
+    font-size: 115%;
+}
+
+.home-menu .pure-menu-selected a {
+    color: white;
+}
+
+.home-menu a {
+    color: #6FBEF3;
+}
+.home-menu li a:hover,
+.home-menu li a:focus {
+    background: none;
+    border: none;
+    color: #AECFE5;
+}
+
+/* Container for the whole app */
+.content {
+	max-width: 980px;
+	margin:0 auto;
+	margin-top: 50px;
+	padding-bottom: 1em;
+}
+
+.min-height {
+  min-height: 90vh;
+}
+
+
+.simple-outline {
+	border: 0px solid grey;
+	margin: 0.5em;
+}
+
+.inputs-header{
+	margin: 0.5em;
+}
+
+.results-header{
+	margin: 0.5em;
+}
+
+.card {
+  background-color: #E5E6E4;
+  padding: 1em;
+  padding-bottom: 0;
+  margin: 0em;
+  margin-top: 0em;
+}
+
+.header-card {
+	margin: 0em;
+	background-color: #6496c8;
+	padding: 1em;
+}
+
+.add-value {
+font-size: 0.75em;
+padding: 0.3em;
+  float: right;
+  margin-bottom: 1em;
+  color: #fff;
+  background-color: #6496c8;
+  text-shadow: -1px 1px #417cb8;
+  border: none;
+}
+
+.add-value:hover, 
+.add-value.hover {
+	background-color: #346392;
+	text-shadow: -1px 1px #27496d;
+}
+
+.add-value:active,
+.add-value.active {
+	background-color: #27496d;
+	text-shadow: -1px 1px #193047;
+}
+
+.card-title {
+	box-sizing: border-box;
+	color: #ffffff;
+	border: none;
+	border-bottom: 2px solid #c9c9c9;
+	outline: none;	
+	font-size: 1.25em;
+	width: 100%;
+	background-color: #6496c8;
+	padding: 0.25em;
+	transition: border-bottom 0.3s, background-color 0.3s;
+}
+.card-title:focus,
+.card-title.focus {
+	border-bottom: 2px solid #969696;
+	background-color: #7ba6d1;
+}
+
+.enumeration {
+	background-color: #E5E6E4;
+	box-sizing: border-box;
+ 	border: none;
+  	outline: none;
+  	border-bottom: solid 2px #c9c9c9;
+  font-size: 1em;
+  width: 100%;
+  display: block;
+  margin-bottom: 0.5em;
+  float:left;
+  padding: 0.25em;
+  transition: border 0.3s, background-color 0.3s;
+}
+
+.enumeration:focus,
+.enumeration.focus {
+  border-bottom: solid 2px #969696;
+  background-color: #fff8b2;
+}
+
+.float-clear {
+  clear: both;
+}
+
+/* Footer */
+.footer {
+    background-color: #2d3e50;
+    color: #fffaf0;
+    text-align: center;
+	padding: 0.25em;
+}
+.footer a {
+    color: #ddd;
+}
+
+.footer p {
+	margin: 0.25em;
 }

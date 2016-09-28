@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+<style>
+
+/* Menu -- customize the .pure-menu at the top of the page */
+.home-menu {
+    padding: 0.25em;
+    text-align: left;
+    box-shadow: 0 1px 1px rgba(0,0,0, 0.10);
+}
+
+.home-menu {
+    background: #2d3e50;
+}
+.pure-menu.pure-menu-fixed {
+    /* Fixed menus normally have a border at the bottom. */
+    border-bottom: none;
+    /* I need a higher z-index here because of the scroll-over effect. */
+    z-index: 4;
+}
+
+.home-menu .pure-menu-heading {
+    color: white;
+    font-weight: 400;
+    font-size: 115%;
+}
+
+.home-menu .pure-menu-selected a {
+    color: white;
+}
+
+.home-menu a {
+    color: #6FBEF3;
+}
+.home-menu li a:hover,
+.home-menu li a:focus {
+    background: none;
+    border: none;
+    color: #AECFE5;
+}
+
+/* Container for the whole app */
+.content {
+	max-width: 980px;
+	margin:0 auto;
+	margin-top: 50px;
+	padding-bottom: 1em;
+}
+
+.simple-outline {
+	border: 0px solid grey;
+	margin: 0.5em;
+}
+
+.inputs-header{
+	margin: 0.5em;
+}
+
+.results-header{
+	margin: 0.5em;
+}
+
+.card {
+  background-color: #E5E6E4;
+  padding: 1em;
+  padding-bottom: 0;
+  margin: 0em;
+  margin-top: 0em;
+}
+
+.header-card {
+	margin: 0em;
+	background-color: #6496c8;
+	padding: 1em;
+}
+
+.add-value {
+font-size: 0.75em;
+padding: 0.3em;
+  float: right;
+  margin-bottom: 1em;
+  color: #fff;
+  background-color: #6496c8;
+  text-shadow: -1px 1px #417cb8;
+  border: none;
+}
+
+.add-value:hover, 
+.add-value.hover {
+	background-color: #346392;
+	text-shadow: -1px 1px #27496d;
+}
+
+.add-value:active,
+.add-value.active {
+	background-color: #27496d;
+	text-shadow: -1px 1px #193047;
+}
+
+.card-title {
+	box-sizing: border-box;
+	color: #ffffff;
+	border: none;
+	border-bottom: 2px solid #c9c9c9;
+	outline: none;	
+	font-size: 1.25em;
+	width: 100%;
+	background-color: #6496c8;
+	padding: 0.25em;
+	transition: border-bottom 0.3s, background-color 0.3s;
+}
+.card-title:focus,
+.card-title.focus {
+	border-bottom: 2px solid #969696;
+	background-color: #7ba6d1;
+}
+
+.enumeration {
+	background-color: #E5E6E4;
+	box-sizing: border-box;
+ 	border: none;
+  	outline: none;
+  	border-bottom: solid 2px #c9c9c9;
+  font-size: 1em;
+  width: 100%;
+  display: block;
+  margin-bottom: 0.5em;
+  float:left;
+  padding: 0.25em;
+  transition: border 0.3s, background-color 0.3s;
+}
+
+.enumeration:focus,
+.enumeration.focus {
+  border-bottom: solid 2px #969696;
+  background-color: #fff8b2;
+}
+
+.float-clear {
+  clear: both;
+}
+
+/* Footer */
+.footer {
+    background-color: #2d3e50;
+    color: #fffaf0;
+    text-align: center;
+	padding: 0.25em;
+}
+.footer a {
+    color: #ddd;
+}
+
+.footer p {
+	margin: 0.25em;
+}
+
+</style>
+</head>
+<body>
+
+<div class="header">
+    <div class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed">
+        <a class="pure-menu-heading" href="">Clarify</a>
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item"><button class="button-xsmall pure-button">Add Variable</button></li>
+            <li class="pure-menu-item"><button class="button-xsmall pure-button">Reset All</button></li>
+            <li class="pure-menu-item"><button class="button-xsmall pure-button">Export</button></li>
+        </ul>
+    </div>
+</div>
+
+<div class="content">
+	<div class="pure-g">
+		<div class="pure-u-1-2">
+			<div class="inputs-header">
+				<h3>Input Variables</h3>
+			</div>
+			<div class="simple-outline">
+				<div class="header-card card">
+					<input class="card-title">
+				</div>
+				<div class="card">
+					<input class="enumeration" placeholder="Your text here...">
+					<input class="enumeration">
+					<input class="enumeration">
+					<button class="add-value">
+				    	Add New Option
+				  	</button>
+				 	<div class="float-clear"></div>
+				 </div>
+			</div>
+			<div class="simple-outline">			
+				<div class="header-card card">
+					<input class="card-title">
+				</div>
+
+				<div class="card">
+					<input class="enumeration" placeholder="Your text here...">
+					<input class="enumeration">
+					<input class="enumeration">
+					<button class="add-value">
+				    	Add New Option
+				  	</button>
+				 	<div class="float-clear"></div>
+				 </div>
+			</div>
+			<div class="simple-outline">
+				 <div class="header-card card">
+					<input class="card-title">
+				</div>
+				 <div class="card">
+					<input class="enumeration" placeholder="Your text here...">
+					<input class="enumeration">
+					<input class="enumeration">
+					<button class="add-value">
+				    	Add New Option
+				  	</button>
+				 	<div class="float-clear"></div>
+			 </div>
+			</div>
+			<div class="simple-outline">
+				 <div class="header-card card">
+					<input class="card-title">
+				</div>
+				 <div class="card">
+					<input class="enumeration" placeholder="Your text here...">
+					<input class="enumeration">
+					<input class="enumeration">
+					<button class="add-value">
+				    	Add New Option
+				  	</button>
+				 	<div class="float-clear"></div>
+			 </div>
+			</div>
+
+		</div>
+		<div class="pure-u-1-2">
+			<div class="results-header">
+				<h3>Results</h3>
+			</div>
+			<div class="simple-outline">
+				<div class="header-card card">
+					<input class="card-title">
+				</div>
+				<div class="card">
+					<input class="enumeration" placeholder="Your text here...">
+					<input class="enumeration">
+					<input class="enumeration">
+					<input class="enumeration">
+					<input class="enumeration">
+					<input class="enumeration">
+					<input class="enumeration">
+					<input class="enumeration">
+					<input class="enumeration">
+					<input class="enumeration">
+					<input class="enumeration">
+					<input class="enumeration">
+				 	<div class="float-clear"></div>
+				 </div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="footer">
+    <p><a href="https://github.com/tylrob/clarify">View source on GitHub</a></p>
+</div>
+
+
+</body>
+</html>
