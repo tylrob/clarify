@@ -43,25 +43,41 @@
 
 		<!-- Template for composite view -->
 		<script type="text/template" id="composite-view">
-			<p>Input Name: <input class="composite-input"></p>
-			<div class="composite-attach"></div>
-			<div><button class="add-new-input-value">Add New Input Value</button></div>
+			<div class="simple-outline">
+				<div class="header-card card">
+					<input class="composite-input"><button class="add-new-input-value">
+						Add New Option
+					</button>
+				</div>
+				<div class="card">
+					<div class="composite-attach"></div>				
+					
+				 	<div class="float-clear"></div>
+				 </div>
+			</div>
 		</script>
 
 		<!-- Template for an Input -->
 		<script type="text/template" id="input-item-view">
-			<p>Input Value: <input class="input"></p>
+			<input class="input">
 		</script>
 
 		<!-- Template for composite view -->
 		<script type="text/template" id="output-composite-view">
-			<p>Name passed from model: <%= name %></p>
-			<div class="output-composite-attach"></div>
+			<div class="simple-outline">
+				<div class="header-card card">
+					<input class="composite-input">
+				</div>
+				<div class="card">
+					<div class="output-composite-attach"></div>
+					<div class="float-clear"></div>
+				</div>
+			</div>
 		</script>
 
 		<!-- Template for an Output -->
 		<script type="text/template" id="output-item-view">
-			<p>Output Value: <input class="input"></p>
+			<input class="input">
 		</script>
 
 		<script type="text/javascript" src="js/jquery.js"></script>

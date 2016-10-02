@@ -29,16 +29,25 @@ var App = Marionette.Application.extend({
 		});
 		this.vent.on("newInputValueAdded", function(){
 			app.refreshRelationships();
-			console.log("Hi");
 		});
 	},
+	resetSelection: function(){
+		//Select the first output existing at the moment.
+		var outputValue = app.outputs.at(0).get('outputValues').at(0).cid;
+		app.outputs.at(0).selectOutputValueByCid(outputValue);
+		var activeRelationship = app.relationships.lookupUsingOutputValue(outputValue);
+		app.inputs.selectInputValuesByCid(activeRelationship.get('inputs'));
+
+	},
 	addInput: function(){
-		if (this.inputs.length >= 5){
+		if (this.inputs.length >= 7){
 			alert("Too many inputs!");
 			return;
 		}
 		this.inputs.create();
 		this.refreshRelationships();
+		this.resetSelection();
+
 	},
 	refreshRelationships: function(){
 		this.setPrevOutputs(this.outputs, this.prevOutputs);
@@ -56,6 +65,8 @@ var App = Marionette.Application.extend({
 		this.outputs.create();
 		
 		this.computeRelationships(this.inputs, this.outputs, this.relationships);	
+
+		this.resetSelection();
 
 	},
 	setPrevOutputs: function(outputs, prevOutputs){
@@ -120,7 +131,7 @@ var App = Marionette.Application.extend({
 				}
 			}
 			//console.log(counters);
-			var newestOutput = outputs.at(0).get('outputValues').create({text: iterator});
+			var newestOutput = outputs.at(0).get('outputValues').create({text: "Result " + (iterator + 1)});
 			//console.log("created in relCalc: " + newestOutput.cid);
 
 			var inputValueCids = [];
@@ -135,7 +146,7 @@ var App = Marionette.Application.extend({
 		}
 		//This last push() is for the final value after the while loop
 			//console.log(counters);
-			newestOutput = outputs.at(0).get('outputValues').create({text: iterator});
+			newestOutput = outputs.at(0).get('outputValues').create({text: "Result " + (iterator + 1)});
 			//console.log("created in relCalc: " + newestOutput.cid);
 
 			inputValueCids = [];
@@ -272,11 +283,8 @@ var App = Marionette.Application.extend({
 //Input Models
 var InputValue = Backbone.Model.extend({
 	defaults: {
-		text: 'New Input Value',
+		text: 'New Option',
 		selected: 'not-selected'
-	},
-	initialize: function(){
-		//console.log("InputValue model initialized " + this.cid);
 	}
 });
 
@@ -285,14 +293,7 @@ var InputValues = Backbone.Collection.extend({
 	localStorage: new Backbone.LocalStorage('complexity-input-values'),
 	initialize: function(){
 		//console.log('InputValues collection initialized');
-		this.create({
-			text: 'New Input Value',
-			selected: 'selected'
-		});
-		/*this.create({
-			text: 'True',
-			selected: 'not-selected'
-		});*/
+		this.create();
 	},
 	getSelectedInputValue: function(){
 		var selectedInputValue = this.find(function(inputValue){
@@ -393,7 +394,7 @@ var Output = Backbone.AssociatedModel.extend({
 	],
 
 	defaults: {
-		name: "untitled",
+		name: "Results",
 		selectedOutputValue: null,
 		previouslySelectedOutputValue: null,
 		outputValues: null
@@ -432,7 +433,7 @@ var Outputs = Backbone.Collection.extend({
 	localStorage: new Backbone.LocalStorage('complexity-outputs'),
 	initialize: function(){
 		this.create({
-			name: "untitled output"
+			name: "Results"
 		});
 	}
 });
@@ -485,7 +486,7 @@ var InputItemView = Marionette.ItemView.extend({
 		this.syncHighlightToModel();
 	},
 	events: {
-		'click': function(){this.select('clickedView')},
+		//'click': function(){this.select('clickedView')},
 		'focusin input': function(){this.select('focusInput')},
 		'keypress': 'updateOnEnter',
 		'blur input': 'close'
@@ -493,23 +494,24 @@ var InputItemView = Marionette.ItemView.extend({
 	onRender: function(){
 		var prepopulatedValue = this.model.get('text');
 		this.$('input').val(prepopulatedValue);
+
 	},
 	syncHighlightToModel: function(){
 		console.log("I'm syncing highlight to model");
 		if (this.model.get('selected') === 'selected') {
-			$(this.el).addClass('selected');		
+			this.$('input').addClass('selected');		
 		} else {
-			$(this.el).removeClass('selected');
+			this.$('input').removeClass('selected');
 		}	
 	},
 	select: function(source){
-		if (this.model.get('selected') === 'selected'){	
+		/*if (this.model.get('selected') === 'selected'){	
 			console.log("don't reselect; it's already selected (input not hidden)");
 			return;
-		} else {
+		} else {*/
 			this.trigger('childSelected', this.model.cid);
 			app.vent.trigger('inputItemViewSelected', this.model.cid);
-		}
+		/*}*/
 		if (source === 'clickedView') {
 			this.$('input').focus();	
 		}
@@ -574,6 +576,7 @@ var InputView = Marionette.CompositeView.extend({
 		console.log("Add new input value button clicked");
 		this.collection.create();
 		app.vent.trigger('newInputValueAdded');
+		app.resetSelection();
 	}
 });
 
@@ -602,19 +605,19 @@ var OutputItemView = Marionette.ItemView.extend({
 	syncHighlightToModel: function(){
 		console.log("I'm syncing highlight to model");
 		if (this.model.get('selected') === 'selected') {
-			$(this.el).addClass('selected');		
+			this.$('input').addClass('selected');		
 		} else {
-			$(this.el).removeClass('selected');
+			this.$('input').removeClass('selected');
 		}	
 	},
 	select: function(source){
-		if (this.model.get('selected') === 'selected'){	
+		/*if (this.model.get('selected') === 'selected'){	
 			console.log("don't reselect; it's already selected (input not hidden)");
 			return;
-		} else {
+		} else {*/
 			this.trigger('childSelected', this.model.cid);
 			app.vent.trigger('outputItemViewSelected', this.model.cid);
-		}
+		/*}*/
 		if (source === 'clickedView') {
 			this.$('input').focus();	
 		}
@@ -636,6 +639,10 @@ var OutputItemView = Marionette.ItemView.extend({
 });
 
 var OutputView = Marionette.CompositeView.extend({
+	events: {
+		'keypress': 'updateOnEnter',
+		'blur .composite-input': 'close'
+	},
 	childView: OutputItemView,
 	childEvents: {
 		'childSelected': 'childSelected'
@@ -647,6 +654,25 @@ var OutputView = Marionette.CompositeView.extend({
 	template: "#output-composite-view",
 	initialize: function(){
 		this.collection = this.model.get('outputValues');
+	},
+	onRender: function(){
+		var prepopulatedValue = this.model.get('name');
+		this.$('.composite-input').val(prepopulatedValue);
+	},
+	close: function(){
+		console.log("composite view close running");		
+		var value = this.$('.composite-input').val();
+		var trimmedValue = value.trim();
+
+		if (trimmedValue){
+			this.model.save({name: trimmedValue});
+		}
+		console.log("saved composite view name: " + this.model.get('name'));
+	},
+	updateOnEnter: function(e){
+		if (e.which === 13) { //ENTER_KEY is 13
+			this.close();
+		}
 	}
 });
 
@@ -682,9 +708,10 @@ var NavView = Marionette.ItemView.extend({
 var app = new App();
 
 //Begin app initialization
+
+app.relationships = new Relationships();
 app.inputs = new Inputs();
 app.outputs = new Outputs();
-app.relationships = new Relationships();
 app.prevOutputs = new Outputs();
 app.prevRelationships = new Relationships();
 
@@ -701,3 +728,5 @@ app.computeRelationships(app.inputs, app.outputs, app.relationships);
 app.myLayout.getRegion('header').show(app.navView);
 app.myLayout.getRegion('inputs').show(app.inputsView);
 app.myLayout.getRegion('outputs').show(app.outputsView);
+
+app.resetSelection();
